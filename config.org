@@ -20,7 +20,7 @@ indentation width you prefer in the ~web-mode~ section.)
     :preface
     (defvar ian/indent-width 4) ; change this value to your preferred width
     :config
-    (setq frame-title-format '("Yay-Evil") ; Yayyyyy Evil!
+    (setq frame-title-format '("Garrett-Evil") ;
           ring-bell-function 'ignore       ; minimize distraction
           frame-resize-pixelwise t
           default-directory "~/")
@@ -59,6 +59,7 @@ indentation width you prefer in the ~web-mode~ section.)
     (global-set-key (kbd "C-x 2") #'ian/split-and-follow-horizontally)
     (global-set-key (kbd "C-x 3") #'ian/split-and-follow-vertically))
 #+END_SRC
+
 * Configuration for built-in packages
 Since we're using use-package as our package management system, we
 might as well try to organize under the same syntax as much as
@@ -281,16 +282,45 @@ subsequently killing Emacs.
       (define-key evil-insert-state-map (kbd "C-n") nil)
       (define-key evil-insert-state-map (kbd "C-p") nil))
     (evil-ex-define-cmd "q" #'kill-this-buffer)
-    (evil-ex-define-cmd "wq" #'ian/save-and-kill-this-buffer))
+    (evil-ex-define-cmd "wq" #'ian/save-and-kill-this-buffer)
+    (evil-define-key 'normal org-mode-map (kbd "TAB") #'org-cycle)
+    (evil-define-key 'normal org-mode-map (kbd "<") #'org-do-promote)
+    (evil-define-key 'normal org-mode-map (kbd ">") #'org-do-demote)
+    (evil-define-key 'normal org-mode-map (kbd "M-<") #'org-promote-subtree)
+    (evil-define-key 'normal org-mode-map (kbd "M->") #'org-demote-subtree))
+
+(setq-default evil-escape-delay 0.2)
+
 #+END_SRC
-Evil-collection covers more parts of Emacs that the original Evil
-doesn't support (e.g. Packages buffer, eshell, calendar etc.)
+
+Evil-leader
 #+BEGIN_SRC emacs-lisp
-  (use-package evil-collection
-    :after evil
-    :config
-    (setq evil-collection-company-use-tng nil)
-    (evil-collection-init))
+  (use-package evil-leader
+    :after evil)
+
+  (global-evil-leader-mode)
+  (evil-leader/set-key
+     "e" 'find-file
+     "b" 'switch-to-buffer
+     "k" 'kill-buffer
+     "l" 'load-file
+     "c" 'string-rectangle
+     "/" 'comment-or-uncomment-region
+     "s" 'ag-project
+     "r" 'helm-resume
+     "i" 'ivy-resume)
+
+    (evil-leader/set-leader ",")
+#+END_SRC
+
+  Evil-collection covers more parts of Emacs that the original Evil
+  doesn't support (e.g. Packages buffer, eshell, calendar etc.)
+  #+BEGIN_SRC emacs-lisp
+    (use-package evil-collection
+      :after evil
+      :config
+      (setq evil-collection-company-use-tng nil)
+      (evil-collection-init))
 #+END_SRC
 Emulates tpope's vim commentary package (Use ~gcc~ to comment out a line,
 ~gc~ to comment out the target of a motion (for example, ~gcap~ to
@@ -366,6 +396,220 @@ h3...) a more visually pleasing look.
 
   (use-package org-bullets :hook (org-mode . org-bullets-mode))
 #+END_SRC
+
+#+begin_src emacs-lisp
+ (setq org-todo-keywords
+    '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELED")))
+
+  ;;;; ORG-MODE: Behavior and key map for opening the agenda
+  (defun gpk-pop-to-org-agenda (split)
+    "Visit the org agenda, in the current window or a SPLIT."
+    (interactive "P")
+    (org-agenda-list)
+    (when (not split)
+      (delete-other-windows)))
+
+  (define-key global-map (kbd "C-c a") 'gpk-pop-to-org-agenda)
+
+  (setq org-capture-templates
+        '(("t" "My TODO task format." entry
+           (file "me.org")
+          "* TODO [#B] %? %^G
+         SCHEDULED: %t")))
+
+  ;;;; ORG-MODE: Behavior and key-map for capturing tasks
+  (defun gpk-org-task-capture ()
+   "Capture a task with my default template."
+    (interactive)
+      (org-capture nil "t"))
+
+  (define-key global-map (kbd "C-c t") 'gpk-org-task-capture)
+  (define-key global-map (kbd "C-c C-x s") 'org-babel-execute-src-block)
+
+  (setq org-default-notes-file "~/git/me/org/todo/me.org")
+  (setq org-directory "~/git/me/org/todo")
+
+  (setq org-agenda-tag-filter-preset
+        (quote ("-backlog")))
+
+ ;; ;; Collect all .org from my Org directory and subdirs
+  (setq org-agenda-file-regexp "\\`[^.].*\\.org\\'") ; default value
+  (defun load-org-agenda-files-recursively (dir) "Find all directories in DIR."
+     (unless (file-directory-p dir) (error "Not a directory `%s'" dir))
+     (unless (equal (directory-files dir nil org-agenda-file-regexp t) nil)
+        (add-to-list 'org-agenda-files dir)
+      )
+      (dolist (file (directory-files dir nil nil t))
+         (unless (member file '("." ".."))
+            (let ((file (concat dir file "/")))
+              (when (file-directory-p file)
+                (load-org-agenda-files-recursively file)
+                )
+              )
+            )
+          )
+        )
+  (load-org-agenda-files-recursively "~/git/me/org/todo")
+  (load-org-agenda-files-recursively "~/.org-jira")
+
+  (setq org-refile-targets
+     '((nil :maxlevel . 14)
+        (org-agenda-files :maxlevel . 14)))
+
+ ;;  ; ;;;; ORG-MODE: Other customizations
+ (setq org-agenda-text-search-extra-files '(agenda-archives))
+   (setq org-blank-before-new-entry '((heading . t)
+                                     (plain-list-item . t)))
+  (setq org-enforce-todo-dependencies t)
+  (setq org-log-done (quote time))
+  (setq org-log-redeadline (quote time))
+  (setq org-log-reschedule (quote time))
+  ;;(setq org-hide-emphasis-markers t)
+  (setq org-agenda-timegrid-use-ampm t)
+
+ ;; ;;;; ORG-MODE: Evil key mapping
+  (add-hook 'org-agenda-mode-hook
+            (lambda ()
+              (define-key org-agenda-mode-map "j"         'org-agenda-next-line)
+              (define-key org-agenda-mode-map "k"         'org-agenda-previous-line)
+              (define-key org-agenda-mode-map "n"         'org-agenda-next-date-line)
+              (define-key org-agenda-mode-map "p"         'org-agenda-previous-date-line)
+              (define-key org-agenda-mode-map ":"         'org-agenda-set-tags)
+              (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to)
+              ))
+
+ ;; ;;;; ORG-MODE: Auto insert when capturing tasks
+  (add-hook 'org-capture-mode-hook
+            (lambda ()
+              (evil-insert-state)))
+  (put 'erase-buffer 'disabled nil)
+
+  (setq org-agenda-skip-scheduled-if-done t)
+
+  (global-set-key "\C-cf" 'org-agenda)
+
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled 3)
+
+  (define-key global-map (kbd "C-c D") 'org-decrypt-entry)
+  (define-key global-map (kbd "C-c C-a") 'org-attach)
+  (define-key global-map (kbd "C-c C-O") 'org-attach-open-in-emacs)
+
+   (setq gpk/org-adjust-tags-column t)
+
+   (defun gpk/org-adjust-tags-column-reset-tags ()
+     "In org-mode buffers it will reset tag position according to
+   `org-tags-column'."
+     (when (and
+            (not (string= (buffer-name) "*Remember*"))
+            (eql major-mode 'org-mode))
+       (let ((b-m-p (buffer-modified-p)))
+        (condition-case nil
+             (save-excursion
+               (goto-char (point-min))
+               (command-execute 'outline-next-visible-heading)
+               ;; disable (message) that org-set-tags generates
+            (flet ((message (&rest ignored) nil))
+              (org-set-tags 1 t))
+              (set-buffer-modified-p b-m-p))
+          (error nil)))))
+
+  (defun gpk/org-adjust-tags-column-now ()
+    "Right-adjust `org-tags-column' value, then reset tag position."
+    (set (make-local-variable 'org-tags-column)
+         (- (- (window-width) (length org-ellipsis))))
+    (gpk/org-adjust-tags-column-reset-tags))
+
+  (defun gpk/org-adjust-tags-column-maybe ()
+    "If `gpk/org-adjust-tags-column' is set to non-nil, adjust tags."
+    (when gpk/org-adjust-tags-column
+      (gpk/org-adjust-tags-column-now)))
+
+  (defun gpk/org-adjust-tags-column-before-save ()
+    "Tags need to be left-adjusted when saving."
+    (when gpk/org-adjust-tags-column
+     (setq org-tags-column 1)
+       (gpk/org-adjust-tags-column-reset-tags)))
+
+  (defun gpk/org-adjust-tags-column-after-save ()
+   "Revert left-adjusted tag position done by before-save hook."
+    (gpk/org-adjust-tags-column-maybe)
+    (set-buffer-modified-p nil))
+
+ ;; ; automatically align tags on right-hand side
+  (add-hook 'window-configuration-change-hook
+            'gpk/org-adjust-tags-column-maybe)
+  (add-hook 'before-save-hook 'gpk/org-adjust-tags-column-before-save)
+  (add-hook 'after-save-hook 'gpk/org-adjust-tags-column-after-save)
+  (add-hook 'org-agenda-mode-hook '(lambda ()
+                                    (setq org-agenda-tags-column (- (window-width)))))
+
+  ; between invoking org-refile and displaying the prompt (which
+  ; triggers window-configuration-change-hook) tags might adjust,
+  ; which invalidates the org-refile cache
+  (defadvice org-refile (around org-refile-disable-adjust-tags)
+    "Disable dynamically adjusting tags"
+    (let ((gpk/org-adjust-tags-column nil))
+      ad-do-it))
+  (ad-activate 'org-refile)
+
+  (setq gpk/org-adjust-tags-column t)
+
+  (defun gpk/org-adjust-tags-column-reset-tags ()
+    "In org-mode buffers it will reset tag position according to
+  `org-tags-column'."
+    (when (and
+           (not (string= (buffer-name) "*Remember*"))
+           (eql major-mode 'org-mode))
+      (let ((b-m-p (buffer-modified-p)))
+       (condition-case nil
+           (save-excursion
+          (goto-char (point-min))
+             (command-execute 'outline-next-visible-heading)
+             ;; disable (message) that org-set-tags generates
+             (flet ((message (&rest ignored) nil))
+               (org-set-tags 1 t))
+             (set-buffer-modified-p b-m-p))
+         (error nil)))))
+
+  (defun gpk/org-adjust-tags-column-now ()
+    "Right-adjust `org-tags-column' value, then reset tag position."
+    (set (make-local-variable 'org-tags-column)
+         (- (- (window-width) (length org-ellipsis))))
+    (gpk/org-adjust-tags-column-reset-tags))
+
+  (defun gpk/org-adjust-tags-column-maybe ()
+    "If `gpk/org-adjust-tags-column' is set to non-nil, adjust tags."
+    (when gpk/org-adjust-tags-column
+      (gpk/org-adjust-tags-column-now)))
+
+  (defun gpk/org-adjust-tags-column-before-save ()
+    "Tags need to be left-adjusted when saving."
+    (when gpk/org-adjust-tags-column
+       (setq org-tags-column 1)
+       (gpk/org-adjust-tags-column-reset-tags)))
+
+  (defun gpk/org-adjust-tags-column-after-save ()
+    "Revert left-adjusted tag position done by before-save hook."
+    (gpk/org-adjust-tags-column-maybe)
+    (set-buffer-modified-p nil))
+
+  ; automatically align tags on right-hand side
+  (add-hook 'window-configuration-change-hook
+            'gpk/org-adjust-tags-column-maybe)
+  (add-hook 'before-save-hook 'gpk/org-adjust-tags-column-before-save)
+  (add-hook 'after-save-hook 'gpk/org-adjust-tags-column-after-save)
+  (add-hook 'org-agenda-mode-hook '(lambda ()
+                                    (setq org-agenda-tags-column (- (window-width)))))
+
+  ; between invoking org-refile and displaying the prompt (which
+  ; triggers window-configuration-change-hook) tags might adjust,
+  ; which invalidates the org-refile cache
+  (defadvice org-refile (around org-refile-disable-adjust-tags)
+    "Disable dynamically adjusting tags"
+    (let ((gpk/org-adjust-tags-column nil))
+      ad-do-it))
+  (ad-activate 'org-refile)
+#+end_src
 *** Useful major modes
 Markdown mode and Web mode, the latter covers our usages of HTML/CSS/JS/JSX/TS/TSX/JSON.
 #+BEGIN_SRC emacs-lisp
@@ -409,3 +653,94 @@ Provides us with hints on available keystroke combinations.
     :config (when (memq window-system '(mac ns x))
               (exec-path-from-shell-initialize)))
 #+END_SRC
+* Essential GPK Customization
+Global keys
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-b") 'ido-switch-buffer) ;; switch between buffers
+#+end_src
+
+LSP Mode
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :hook ((js-mode         ; ts-ls (tsserver wrapper)
+            web-mode        ; ts-ls/HTML/CSS
+            ruby-mode       ; ruby-server
+            ) . lsp-deferred)
+    :commands lsp
+    :config
+    (setq lsp-auto-guess-root t)
+    (setq lsp-log-io nil)
+    (setq lsp-restart 'auto-restart)
+    (setq lsp-enable-symbol-highlighting nil)
+    (setq lsp-enable-on-type-formatting nil)
+    (setq lsp-signature-auto-activate nil)
+    (setq lsp-signature-render-documentation nil)
+    (setq lsp-eldoc-hook nil)
+    (setq lsp-modeline-code-actions-enable nil)
+    (setq lsp-modeline-diagnostics-enable nil)
+    (setq lsp-headerline-breadcrumb-enable nil)
+    (setq lsp-semantic-tokens-enable nil)
+    (setq lsp-enable-folding nil)
+    (setq lsp-enable-imenu nil)
+    (setq lsp-enable-snippet nil)
+    (setq read-process-output-max (* 1024 1024)) ;; 1MB
+    (setq lsp-idle-delay 0.5))
+
+  (use-package lsp-ui
+    :commands lsp-ui-mode
+    :config
+    (setq lsp-ui-doc-enable t)
+    (setq lsp-ui-doc-header t)
+    (setq lsp-ui-doc-include-signature t)
+    (setq lsp-ui-doc-border (face-foreground 'default))
+    (setq lsp-ui-sideline-show-code-actions t)
+    (setq lsp-ui-sideline-delay 0.05)
+    (setq lsp-ui-sideline-show-hover t)
+    (setq lsp-ui-sideline-update-mode t)
+    (setq lsp-ui-peek-enable t)
+    (setq lsp-ui-peek-jump-backward t)
+    (setq lsp-ui-peek-jump-forwardt t)
+    (setq lsp-ui-peek-show-directory t))
+
+  ;; ;; ruby - lsp-mode
+  ;; ;; Set up before-save hooks to format buffer and add/delete imports.
+  ;; (defun lsp-ruby-install-save-hooks ()
+  ;;   (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  ;;   (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  ;; (add-hook 'ruby-mode-hook #'lsp-ruby-install-save-hooks)
+
+  ;; (add-hook 'ruby-mode-hook #'lsp)
+
+ #+end_src
+
+
+Rename file and buffer
+ #+begin_src emacs-lisp
+;; source: http://steve.yegge.googlepages.com/my-dot-emacs-file
+(defun rename-file-and-buffer (new-name)
+  "Renames both current buffer and file it's visiting to NEW-NAME."
+  (interactive "New name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not filename)
+        (message "Buffer '%s' is not visiting a file!" name)
+      (if (get-buffer new-name)
+          (message "A buffer named '%s' already exists!" new-name)
+        (progn
+          (rename-file name new-name 1)
+          (rename-buffer new-name)
+          (set-visited-file-name new-name)
+                    (set-buffer-modified-p nil))))))
+
+
+(global-set-key (kbd "C-c R") 'rename-file-and-buffer)
+ #+end_src
+
+ Projectile
+ #+begin_src emacs-lisp
+   (use-package projectile
+     :config
+     (setq projectile-completion-system 'ido))
+
+   (projectile-global-mode)
+ #+end_src

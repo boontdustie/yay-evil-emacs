@@ -29,7 +29,7 @@
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/"))
 (setq package-enable-at-startup nil)
-(package-initialize)
+;;(package-initialize)
 
 ;; workaround bug in Emacs 26.2
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
