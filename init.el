@@ -2,7 +2,22 @@
 ;;  Author: Ian Y.E. Pan
 ;;; Commentary:
 ;;; A lightweight Emacs config containing only the essentials: shipped with a custom theme!
-;;; Code:
+;;; Covde:
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+
 (defvar file-name-handler-alist-original file-name-handler-alist)
 
 (setq gc-cons-threshold most-positive-fixnum
@@ -24,11 +39,11 @@
                                   (garbage-collect)
                                   (setq gc-cons-threshold ian/gc-cons-threshold)))
 
-(require 'package)
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/"))
-(setq package-enable-at-startup nil)
+;;(require 'package)
+;;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+;;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/"))
+;;(setq package-enable-at-startup nil)
 ;;(package-initialize)
 
 ;; workaround bug in Emacs 26.2
