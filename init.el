@@ -17,6 +17,8 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(straight-use-package 'org)
+
 
 (defvar file-name-handler-alist-original file-name-handler-alist)
 
