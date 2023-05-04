@@ -4,6 +4,8 @@
 ;;; A lightweight Emacs config containing only the essentials: shipped with a custom theme!
 ;;; Covde:
 
+(set-frame-font "Victor Mono 10" nil t)
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -41,12 +43,12 @@
                                   (garbage-collect)
                                   (setq gc-cons-threshold ian/gc-cons-threshold)))
 
-;;(require 'package)
-;;(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-;;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-;;(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/"))
-;;(setq package-enable-at-startup nil)
-;;(package-initialize)
+(require 'package)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/"))
+(setq package-enable-at-startup nil)
+(package-initialize)
 
 ;; workaround bug in Emacs 26.2
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
@@ -63,4 +65,16 @@
 (org-babel-load-file (expand-file-name (concat user-emacs-directory "config.org")))
 
 (provide 'init)
-;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(font-lock-comment-face ((t (:foreground "#6e6a86" :slant italic :weight semi-bold :height 90 :width normal :foundry "UKWN" :family "Victor Mono"))))
+ '(font-lock-keyword-face ((t (:foreground "#c4a7e7" :slant italic :weight normal :height 98 :width normal :foundry "UKWN" :family "Victor Mono")))))

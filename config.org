@@ -452,7 +452,6 @@ h3...) a more visually pleasing look.
            )
          )
    (load-org-agenda-files-recursively "~/git/me/org/todo")
-   (load-org-agenda-files-recursively "~/.org-jira")
 
    (setq org-refile-targets
       '((nil :maxlevel . 14)
@@ -810,4 +809,12 @@ Rename file and buffer
      :host github
      :repo "boontdustie/liquid-mode"
      :branch "master"))
+ #+end_src
+
+
+ #+begin_src emacs-lisp
+   (use-package ag
+     :ensure t
+     :ensure-system-package (ag . "wajig install ag")
+   )
  #+end_src
