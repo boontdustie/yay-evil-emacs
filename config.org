@@ -6,105 +6,8 @@
   (use-package emacs
     :straight t
     :preface
-    (defvar ian/indent-width 4) ; change this value to your preferred width
-    :config
-    (setq frame-title-format '("Hack The Planet") ;
-          ring-bell-function 'ignore       ; minimize distraction
-          frame-resize-pixelwise t
-          default-directory "~/")
-
-    (tool-bar-mode -1)
-    (menu-bar-mode -1)
-
-    ;; BETTER scrolling experience
-    (setq scroll-margin 0
-          scroll-conservatively 101 ; > 100
-          scroll-preserve-screen-position t
-          auto-window-vscroll nil)
-
-    ;; Always use spaces for indentation
-    (setq-default indent-tabs-mode nil
-                  tab-width ian/indent-width)
-
-    ;; Omit default startup screen
-    (setq inhibit-startup-screen t))
-
-  ;; The Emacs default split doesn't seem too intuitive for most users.
-  (use-package emacs
-    :straight t
-    :preface
-    (defun ian/split-and-follow-horizontally ()
-      "Split window below."
-      (interactive)
-      (split-window-below)
-      (other-window 1))
-    (defun ian/split-and-follow-vertically ()
-      "Split window right."
-      (interactive)
-      (split-window-right)
-      (other-window 1))
-    :config
-    (global-set-key (kbd "C-x 2") #'ian/split-and-follow-horizontally)
-    (global-set-key (kbd "C-x 3") #'ian/split-and-follow-vertically))
-#+END_SRC
-
-* Configuration for built-in packages
-Since we're using use-package as our package management system, we
-might as well try to organize under the same syntax as much as
-possible to keep the configuration consistent. The option
-~use-package-always-ensure~ is turned on in ~init.el~, so we'll add
-~:ensure nil~ when configuring the built-in packages.
-#+END_SRC
-** Modernize selection behavior
-Replace the active region just by typing text, just like modern
-editors.
-#+BEGIN_SRC emacs-lisp
-  (use-package delsel
-    :straight t
-    :config (delete-selection-mode +1))
-#+END_SRC
-** Disable scroll-bar
-#+BEGIN_SRC emacs-lisp
-  ;;(use-package scroll-bar
-  ;;  :straight t
-  ;;  :config (scroll-bar-mode -1))
-#+END_SRC
-** Enable column numbers
-#+BEGIN_SRC emacs-lisp
-;;  (use-package simple
-;;  :straight t
-;;  :config (column-number-mode +1))
-#+END_SRC
-** File-related tweaks
-Don't bother confirming killing processes and don't let backup~ files
-scatter around. TODO: fix
-#+BEGIN_SRC emacs-lisp
-;;  (use-package files
-;;    :straight t
-;;    :config
-;;    (setq confirm-kill-processes nil
-;;          create-lockfiles nil ; don't create .# files (crashes 'npm start')
-;;          make-backup-files nil))
-#+END_SRC
-** Automatically refreshes the buffer for changes outside of Emacs
-Auto refreshes every 2 seconds. Don't forget to refresh the version
-control status as well.
-#+BEGIN_SRC emacs-lisp
-  (use-package autorevert
-    :straight t
-    :config
-    (global-auto-revert-mode +1)
-    (setq auto-revert-interval 2
-          auto-revert-check-vc-info t
-          global-auto-revert-non-file-buffers t
-          auto-revert-verbose nil))
-#+END_SRC
-** Eldoc: documentation in the mini-buffer
-Slightly shorten eldoc display delay.
-#+BEGIN_SRC emacs-lisp
-  (use-package eldoc
-    :straight t
-    :diminish eldoc-mode
+    (setq frame-title-format '("Hack The Planet"))
+    (defvar ian/indent-width 4) ;   :diminish eldoc-mode
     :config
     (setq eldoc-idle-delay 0.4))
 #+END_SRC
@@ -141,19 +44,20 @@ Reduce the highlight delay to instantly.
 ** Setting up some frame defaults
 Maximize the frame by default on start-up. Set the font to size 12.
 #+BEGIN_SRC emacs-lisp
-;;  (use-package frame
-;;    :straight t
-;;    :preface
-;;    (defun ian/set-default-font ()
-;;      (interactive)
-;;      (when (member "Consolas" (font-family-list))
-;;        (set-face-attribute 'default nil :family "Consolas"))
-;;      (set-face-attribute 'default nil
-;;                          :height 120
-;;                         :weight 'normal))
-;;    :config
-;;    (setq initial-frame-alist '((fullscreen . maximized)))
-;;    (ian/set-default-font))
+
+ (setq initial-frame-alist '((fullscreen . maximized)))
+  ;;  (use-package frame
+  ;;    :straight t
+  ;;    :preface
+  ;;    (defun ian/set-default-font ()
+  ;;      (interactive)
+  ;;      (when (member "Consolas" (font-family-list))
+  ;;        (set-face-attribute 'default nil :family "Consolas"))
+  ;;      (set-face-attribute 'default nil
+  ;;                          :height 120
+  ;;                         :weight 'normal))
+  ;;    :config
+  ;;    (ian/set-default-font))
 #+END_SRC
 ** Ediff tweaks
 Enter ediff with side-by-side buffers to better compare the
@@ -228,9 +132,9 @@ Normally, we need to add ~:ensure t~ to tell ~use-package~ to download packages 
     :config
     (dashboard-setup-startup-hook)
     (setq dashboard-startup-banner 'logo
-          dashboard-banner-logo-title "The Truth Is Out There"
-          dashboard-items nil
-          dashboard-set-footer nil))
+	  dashboard-banner-logo-title "The Truth Is Out There"
+	  dashboard-items nil
+	  dashboard-set-footer nil))
 #+END_SRC
 *** Syntax highlighting
 Lightweight syntax highlighting improvement for numbers and escape
@@ -257,8 +161,8 @@ subsequently killing Emacs.
     :diminish undo-tree-mode
     :init
     (setq evil-want-C-u-scroll t
-          evil-want-keybinding nil
-          evil-shift-width ian/indent-width)
+	  evil-want-keybinding nil
+	  evil-shift-width ian/indent-width)
     :hook (after-init . evil-mode)
     :preface
     (defun ian/save-and-kill-this-buffer ()
@@ -348,7 +252,7 @@ purpose.
       :config
       (ido-mode +1)
       (setq ido-everywhere t
-            ido-enable-flex-matching t))
+	    ido-enable-flex-matching t))
 
     (use-package ido-vertical-mode
       :straight t
@@ -372,11 +276,11 @@ Use ~C-n~ and ~C-p~ to navigate the tooltip.
     :hook (prog-mode . company-mode)
     :config
     (setq company-minimum-prefix-length 1
-          company-idle-delay 0.1
-          company-selection-wrap-around t
-          company-tooltip-align-annotations t
-          company-frontends '(company-pseudo-tooltip-frontend ; show tooltip even for single candidate
-                              company-echo-metadata-frontend))
+	  company-idle-delay 0.1
+	  company-selection-wrap-around t
+	  company-tooltip-align-annotations t
+	  company-frontends '(company-pseudo-tooltip-frontend ; show tooltip even for single candidate
+			      company-echo-metadata-frontend))
     (define-key company-active-map (kbd "C-n") 'company-select-next)
     (define-key company-active-map (kbd "C-p") 'company-select-previous))
 #+END_SRC
@@ -415,9 +319,9 @@ h3...) a more visually pleasing look.
        (delete-other-windows)))
    (define-key global-map (kbd "C-c a") 'gpk-pop-to-org-agenda)
    (setq org-capture-templates
-         '(("t" "My TODO task format." entry
-            (file "me.org")
-           "* TODO [#B] %?\n SCHEDULED: %t")))
+	 '(("t" "My TODO task format." entry
+	    (file "me.org")
+	   "* TODO [#B] %?\n SCHEDULED: %t")))
 
    ;;;; ORG-MODE: Behavior and key-map for capturing tasks
    (defun gpk-org-task-capture ()
@@ -431,30 +335,30 @@ h3...) a more visually pleasing look.
    (setq org-directory "~/git/me/org/todo")
 
    (setq org-agenda-tag-filter-preset
-         (quote ("-backlog")))
+	 (quote ("-backlog")))
 
    ;; Collect all .org from my Org directory and subdirs
    (setq org-agenda-file-regexp "\\`[^.].*\\.org\\'") ; default value
    (defun load-org-agenda-files-recursively (dir) "Find all directories in DIR."
       (unless (file-directory-p dir) (error "Not a directory `%s'" dir))
       (unless (equal (directory-files dir nil org-agenda-file-regexp t) nil)
-         (add-to-list 'org-agenda-files dir)
+	 (add-to-list 'org-agenda-files dir)
        )
        (dolist (file (directory-files dir nil nil t))
-          (unless (member file '("." ".."))
-             (let ((file (concat dir file "/")))
-               (when (file-directory-p file)
-                 (load-org-agenda-files-recursively file))))))
+	  (unless (member file '("." ".."))
+	     (let ((file (concat dir file "/")))
+	       (when (file-directory-p file)
+		 (load-org-agenda-files-recursively file))))))
    (load-org-agenda-files-recursively "~/git/me/org/todo")
 
    (setq org-refile-targets
       '((nil :maxlevel . 14)
-         (org-agenda-files :maxlevel . 14)))
+	 (org-agenda-files :maxlevel . 14)))
 
   ;;  ; ;;;; ORG-MODE: Other customizations
   (setq org-agenda-text-search-extra-files '(agenda-archives))
     (setq org-blank-before-new-entry '((heading . t)
-                                      (plain-list-item . t)))
+				      (plain-list-item . t)))
    (setq org-enforce-todo-dependencies t)
    (setq org-log-done (quote time))
    (setq org-log-redeadline (quote time))
@@ -464,19 +368,19 @@ h3...) a more visually pleasing look.
 
    ;; ORG-MODE: Evil key mapping
    (add-hook 'org-agenda-mode-hook
-             (lambda ()
-               (define-key org-agenda-mode-map "j"         'org-agenda-next-line)
-               (define-key org-agenda-mode-map "k"         'org-agenda-previous-line)
-               (define-key org-agenda-mode-map "n"         'org-agenda-next-date-line)
-               (define-key org-agenda-mode-map "p"         'org-agenda-previous-date-line)
-               (define-key org-agenda-mode-map ":"         'org-agenda-set-tags)
-               (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to)
-               ))
+	     (lambda ()
+	       (define-key org-agenda-mode-map "j"         'org-agenda-next-line)
+	       (define-key org-agenda-mode-map "k"         'org-agenda-previous-line)
+	       (define-key org-agenda-mode-map "n"         'org-agenda-next-date-line)
+	       (define-key org-agenda-mode-map "p"         'org-agenda-previous-date-line)
+	       (define-key org-agenda-mode-map ":"         'org-agenda-set-tags)
+	       (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to)
+	       ))
 
    ;; ORG-MODE: Auto insert when capturing tasks
    (add-hook 'org-capture-mode-hook
-             (lambda ()
-               (evil-insert-state)))
+	     (lambda ()
+	       (evil-insert-state)))
    (put 'erase-buffer 'disabled nil)
 
    (setq org-agenda-skip-scheduled-if-done t)
@@ -494,35 +398,35 @@ h3...) a more visually pleasing look.
       "In org-mode buffers it will reset tag position according to
       `org-tags-column'."
        (when (and
-          (not (string= (buffer-name) "*Remember*"))
-            (eql major-mode 'org-mode))
-         (let ((b-m-p (buffer-modified-p)))
-          (condition-case nil
-               (save-excursion
-                (goto-char (point-min))
-                (command-execute 'outline-next-visible-heading)
-                ;; disable (message) that org-set-tags generates
-             (flet ((message (&rest ignored) nil))
-               (org-set-tags 1 t))
-               (set-buffer-modified-p b-m-p))
-           (error nil)))))
+	  (not (string= (buffer-name) "*Remember*"))
+	    (eql major-mode 'org-mode))
+	 (let ((b-m-p (buffer-modified-p)))
+	  (condition-case nil
+	       (save-excursion
+		(goto-char (point-min))
+		(command-execute 'outline-next-visible-heading)
+		;; disable (message) that org-set-tags generates
+	     (flet ((message (&rest ignored) nil))
+	       (org-set-tags 1 t))
+	       (set-buffer-modified-p b-m-p))
+	   (error nil)))))
 
     (defun gpk/org-adjust-tags-column-now ()
       "Right-adjust `org-tags-column' value, then reset tag position."
       (set (make-local-variable 'org-tags-column)
-           (- (- (window-width) (length org-ellipsis))))
+	   (- (- (window-width) (length org-ellipsis))))
       (gpk/org-adjust-tags-column-reset-tags))
 
     (defun gpk/org-adjust-tags-column-maybe ()
       "If `gpk/org-adjust-tags-column' is set to non-nil, adjust tags."
       (when gpk/org-adjust-tags-column
-        (gpk/org-adjust-tags-column-now)))
+	(gpk/org-adjust-tags-column-now)))
 
     (defun gpk/org-adjust-tags-column-before-save ()
       "Tags need to be left-adjusted when saving."
       (when gpk/org-adjust-tags-column
        (setq org-tags-column 1)
-         (gpk/org-adjust-tags-column-reset-tags)))
+	 (gpk/org-adjust-tags-column-reset-tags)))
 
     (defun gpk/org-adjust-tags-column-after-save ()
      "Revert left-adjusted tag position done by before-save hook."
@@ -531,11 +435,11 @@ h3...) a more visually pleasing look.
 
     ;; automatically align tags on right-hand side
     (add-hook 'window-configuration-change-hook
-              'gpk/org-adjust-tags-column-maybe)
+	      'gpk/org-adjust-tags-column-maybe)
     (add-hook 'before-save-hook 'gpk/org-adjust-tags-column-before-save)
     (add-hook 'after-save-hook 'gpk/org-adjust-tags-column-after-save)
     (add-hook 'org-agenda-mode-hook '(lambda ()
-                                      (setq org-agenda-tags-column (- (window-width)))))
+				      (setq org-agenda-tags-column (- (window-width)))))
 
     ; between invoking org-refile and displaying the prompt (which
     ; triggers window-configuration-change-hook) tags might adjust,
@@ -543,7 +447,7 @@ h3...) a more visually pleasing look.
     (defadvice org-refile (around org-refile-disable-adjust-tags)
       "Disable dynamically adjusting tags"
       (let ((gpk/org-adjust-tags-column nil))
-        ad-do-it))
+	ad-do-it))
     (ad-activate 'org-refile)
 
     (setq gpk/org-adjust-tags-column t)
@@ -552,35 +456,35 @@ h3...) a more visually pleasing look.
       "In org-mode buffers it will reset tag position according to
     `org-tags-column'."
       (when (and
-             (not (string= (buffer-name) "*Remember*"))
-             (eql major-mode 'org-mode))
-        (let ((b-m-p (buffer-modified-p)))
-         (condition-case nil
-             (save-excursion
-            (goto-char (point-min))
-               (command-execute 'outline-next-visible-heading)
-               ;; disable (message) that org-set-tags generates
-               (flet ((message (&rest ignored) nil))
-                 (org-set-tags 1 t))
-               (set-buffer-modified-p b-m-p))
-           (error nil)))))
+	     (not (string= (buffer-name) "*Remember*"))
+	     (eql major-mode 'org-mode))
+	(let ((b-m-p (buffer-modified-p)))
+	 (condition-case nil
+	     (save-excursion
+	    (goto-char (point-min))
+	       (command-execute 'outline-next-visible-heading)
+	       ;; disable (message) that org-set-tags generates
+	       (flet ((message (&rest ignored) nil))
+		 (org-set-tags 1 t))
+	       (set-buffer-modified-p b-m-p))
+	   (error nil)))))
 
     (defun gpk/org-adjust-tags-column-now ()
       "Right-adjust `org-tags-column' value, then reset tag position."
       (set (make-local-variable 'org-tags-column)
-           (- (- (window-width) (length org-ellipsis))))
+	   (- (- (window-width) (length org-ellipsis))))
       (gpk/org-adjust-tags-column-reset-tags))
 
     (defun gpk/org-adjust-tags-column-maybe ()
       "If `gpk/org-adjust-tags-column' is set to non-nil, adjust tags."
       (when gpk/org-adjust-tags-column
-        (gpk/org-adjust-tags-column-now)))
+	(gpk/org-adjust-tags-column-now)))
 
     (defun gpk/org-adjust-tags-column-before-save ()
       "Tags need to be left-adjusted when saving."
       (when gpk/org-adjust-tags-column
-         (setq org-tags-column 1)
-         (gpk/org-adjust-tags-column-reset-tags)))
+	 (setq org-tags-column 1)
+	 (gpk/org-adjust-tags-column-reset-tags)))
 
     (defun gpk/org-adjust-tags-column-after-save ()
       "Revert left-adjusted tag position done by before-save hook."
@@ -589,11 +493,11 @@ h3...) a more visually pleasing look.
 
     ; automatically align tags on right-hand side
     (add-hook 'window-configuration-change-hook
-              'gpk/org-adjust-tags-column-maybe)
+	      'gpk/org-adjust-tags-column-maybe)
     (add-hook 'before-save-hook 'gpk/org-adjust-tags-column-before-save)
     (add-hook 'after-save-hook 'gpk/org-adjust-tags-column-after-save)
     (add-hook 'org-agenda-mode-hook '(lambda ()
-                                      (setq org-agenda-tags-column (- (window-width)))))
+				      (setq org-agenda-tags-column (- (window-width)))))
 
     ; between invoking org-refile and displaying the prompt (which
     ; triggers window-configuration-change-hook) tags might adjust,
@@ -601,7 +505,7 @@ h3...) a more visually pleasing look.
     (defadvice org-refile (around org-refile-disable-adjust-tags)
       "Disable dynamically adjusting tags"
       (let ((gpk/org-adjust-tags-column nil))
-        ad-do-it))
+	ad-do-it))
     (ad-activate 'org-refile)
 #+end_src
 
@@ -615,10 +519,10 @@ Markdown mode and Web mode, the latter covers our usages of HTML/CSS/JS/JSX/TS/T
   (use-package web-mode
     :straight t
     :mode (("\\.html?\\'" . web-mode)
-           ("\\.css\\'"   . web-mode)
-           ("\\.jsx?\\'"  . web-mode)
-           ("\\.tsx?\\'"  . web-mode)
-           ("\\.json\\'"  . web-mode))
+	   ("\\.css\\'"   . web-mode)
+	   ("\\.jsx?\\'"  . web-mode)
+	   ("\\.tsx?\\'"  . web-mode)
+	   ("\\.json\\'"  . web-mode))
     :config
     (setq web-mode-markup-indent-offset 2) ; HTML
     (setq web-mode-css-indent-offset 2)    ; CSS
@@ -644,14 +548,14 @@ Provides us with hints on available keystroke combinations.
     :config
     (which-key-mode +1)
     (setq which-key-idle-delay 0.4
-          which-key-idle-secondary-delay 0.4))
+	  which-key-idle-secondary-delay 0.4))
 #+END_SRC
 *** Configure PATH on macOS
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :straight t
     :config (when (memq window-system '(mac ns x))
-              (exec-path-from-shell-initialize)))
+	      (exec-path-from-shell-initialize)))
 #+END_SRC
 * Essential GPK Customization
 Global keys
@@ -664,9 +568,9 @@ LSP Mode
   (use-package lsp-mode
     :straight t
     :hook ((js-mode         ; ts-ls (tsserver wrapper)
-            web-mode        ; ts-ls/HTML/CSS
-            ruby-mode       ; ruby-server
-            ) . lsp-deferred)
+	    web-mode        ; ts-ls/HTML/CSS
+	    ruby-mode       ; ruby-server
+	    ) . lsp-deferred)
     :commands lsp
     :config
     (setq lsp-auto-guess-root t)
@@ -723,16 +627,16 @@ Rename file and buffer
      "Renames both current buffer and file it's visiting to NEW-NAME."
      (interactive "sNew name: ")
      (let ((name (buffer-name))
-           (filename (buffer-file-name)))
+	   (filename (buffer-file-name)))
        (if (not filename)
-           (message "Buffer '%s' is not visiting a file!" name)
-         (if (get-buffer new-name)
-             (message "A buffer named '%s' already exists!" new-name)
-           (progn
-             (rename-file name new-name 1)
-             (rename-buffer new-name)
-             (set-visited-file-name new-name)
-             (set-buffer-modified-p nil))))))
+	   (message "Buffer '%s' is not visiting a file!" name)
+	 (if (get-buffer new-name)
+	     (message "A buffer named '%s' already exists!" new-name)
+	   (progn
+	     (rename-file name new-name 1)
+	     (rename-buffer new-name)
+	     (set-visited-file-name new-name)
+	     (set-buffer-modified-p nil))))))
 
 
    (global-set-key (kbd "C-c R") 'rename-file-and-buffer)
@@ -764,8 +668,8 @@ Rename file and buffer
  # Custom formatter to specify using StandardRB
  #+begin_src emacs-lisp
        (use-package real-auto-save
-          :straight t)
-         (add-hook 'org-mode-hook 'real-auto-save-mode)
+	  :straight t)
+	 (add-hook 'org-mode-hook 'real-auto-save-mode)
        (setq real-auto-save-interval 1) ;; in seconds
 
  #+end_src
@@ -773,7 +677,7 @@ Rename file and buffer
  Elfeed
  #+begin_src emacs-lisp
       (use-package elfeed
-          :straight t)
+	  :straight t)
 
       (global-set-key (kbd "C-x w") 'elfeed)
 
@@ -783,18 +687,18 @@ Rename file and buffer
  # Load elfeed-org
 
  #+begin_src emacs-lisp
-         (use-package elfeed-org
-           :straight t)
+	 (use-package elfeed-org
+	   :straight t)
 
-         ;; Initialize elfeed-org
-         ;; This hooks up elfeed-org to read the configuration when elfeed
-         ;; is started with =M-x elfeed=
-         (elfeed-org)
+	 ;; Initialize elfeed-org
+	 ;; This hooks up elfeed-org to read the configuration when elfeed
+	 ;; is started with =M-x elfeed=
+	 (elfeed-org)
 
-         ;; Optionally specify a number of files containing elfeed
-         ;; configuration. If not set then the location below is used.
-         ;; Note: The customize interface is also supported.
-         (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed/elfeed.org"))
+	 ;; Optionally specify a number of files containing elfeed
+	 ;; configuration. If not set then the location below is used.
+	 ;; Note: The customize interface is also supported.
+	 (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed/elfeed.org"))
  #+end_src
 
  #+begin_src emacs-lisp
@@ -808,27 +712,24 @@ Rename file and buffer
  #+begin_src emacs-lisp
    (set-language-environment "UTF-8")
    (set-default-coding-systems 'utf-8)
-   (set-frame-font "Source Code Pro for Powerline 14")
-
    (setq default-fill-column 80)
    (setq delete-old-versions -1 )		; delete excess backup versions silently
    (setq version-control t )		; use version control
    (setq vc-make-backup-files t )		; make backups file even when in version controlled dir
-   (setq backup-directory-alist `(("." . "~/.emacs.d/backups")) ) ; which directory to put backups file
+   (setq make-backup-files nil) ; stop creating ~ files
    (setq vc-follow-symlinks t )                                   ; don't ask for confirmation when opening symlinked file
-   (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)) ) ;transform backups file name
    (setq inhibit-startup-screen t )	; inhibit useless and old-school startup screen
    (setq ring-bell-function 'ignore )	; silent bell when you make a mistake
    (setq sentence-end-double-space nil)	; sentence SHOULD end with only a point.
    (setq default-fill-column 80)		; toggle wrapping text at the 80th character
-   (setq initial-scratch-message "Welcome to Emacs")
 
  #+end_src
-
 
  #+begin_src emacs-lisp
-   (use-package ag
-     :ensure t
-     :ensure-system-package (ag . "wajig install ag")
-   )
- #+end_src
+   (use-package use-package-ensure-system-package
+     :ensure t)
+      (use-package ag
+	     :ensure t
+	     :ensure-system-package (ag . "wajig install ag"))
+
+#+end_src

@@ -4,7 +4,11 @@
 ;;; A lightweight Emacs config containing only the essentials: shipped with a custom theme!
 ;;; Covde:
 
-(set-frame-font "Victor Mono 10" nil t)
+
+(if (not (string= "darwin" system-type))
+    (set-frame-font "Victor Mono 10" nil t)
+  (set-frame-font "Victor Mono 14" nil t)
+)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -12,9 +16,9 @@
       (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
+	(url-retrieve-synchronously
+	 "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+	 'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -32,23 +36,23 @@
 (defvar ian/gc-cons-threshold 100000000)
 
 (add-hook 'emacs-startup-hook ; hook run after loading init files
-          (lambda ()
-            (setq gc-cons-threshold ian/gc-cons-threshold
-                  gc-cons-percentage 0.1
-                  file-name-handler-alist file-name-handler-alist-original)))
+	  (lambda ()
+	    (setq gc-cons-threshold ian/gc-cons-threshold
+		  gc-cons-percentage 0.1
+		  file-name-handler-alist file-name-handler-alist-original)))
 
 (add-hook 'minibuffer-setup-hook (lambda ()
-                                   (setq gc-cons-threshold (* ian/gc-cons-threshold 2))))
+				   (setq gc-cons-threshold (* ian/gc-cons-threshold 2))))
 (add-hook 'minibuffer-exit-hook (lambda ()
-                                  (garbage-collect)
-                                  (setq gc-cons-threshold ian/gc-cons-threshold)))
+				  (garbage-collect)
+				  (setq gc-cons-threshold ian/gc-cons-threshold)))
 
 (require 'package)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/"))
 (setq package-enable-at-startup nil)
-(package-initialize)
+;;(package-initialize)
 
 ;; workaround bug in Emacs 26.2
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
@@ -64,7 +68,6 @@
 (require 'org)
 (org-babel-load-file (expand-file-name (concat user-emacs-directory "config.org")))
 
-(provide 'init)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -76,5 +79,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(font-lock-comment-face ((t (:foreground "#6e6a86" :slant italic :weight semi-bold :height 90 :width normal :foundry "UKWN" :family "Victor Mono"))))
- '(font-lock-keyword-face ((t (:foreground "#c4a7e7" :slant italic :weight normal :height 98 :width normal :foundry "UKWN" :family "Victor Mono")))))
+ '(font-lock-comment-face ((t (:foreground "#6e6a86" :slant italic :weight semi-bold :height 120 :width normal :foundry "UKWN" :family "Victor Mono"))))
+  '(font-lock-keyword-face ((t (:foreground "#c4a7e7" :slant italic :weight normal :height 160 :width normal :foundry "UKWN" :family "Victor Mono")))))
+
+(provide 'init)
