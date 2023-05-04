@@ -824,3 +824,11 @@ Rename file and buffer
    (setq initial-scratch-message "Welcome to Emacs")
 
  #+end_src
+
+
+ #+begin_src emacs-lisp
+   (use-package ag
+     :ensure t
+     :ensure-system-package (ag . "wajig install ag")
+   )
+ #+end_src
