@@ -11,6 +11,7 @@
     :config
     (setq eldoc-idle-delay 0.4))
 #+END_SRC
+
 ** Indentation improvement
 For Java and C/C++, change the formatting style from GNU (the default)
 to the more standard K&R. Here we also set the indentation width of C,
@@ -24,6 +25,7 @@ the value depending on the language as well.
     :straight t
     :config (setq python-indent-offset ian/indent-width))
 #+END_SRC
+
 ** Mouse wheel (track-pad) scroll speed
 By default, the scrolling is way too fast to be precise and helpful,
 let's tune it down a little bit.
@@ -33,6 +35,7 @@ let's tune it down a little bit.
 ;;    :config (setq mouse-wheel-scroll-amount '(2 ((shift) . 1))
 ;;                  mouse-wheel-progressive-speed nil))
 #+END_SRC
+
 ** Show matching parentheses
 Reduce the highlight delay to instantly.
 #+BEGIN_SRC emacs-lisp
@@ -305,93 +308,6 @@ h3...) a more visually pleasing look.
       :straight t
       :hook (org-mode . org-bullets-mode))
 #+END_SRC
-
-#+begin_src emacs-lisp
-  (setq org-todo-keywords
-     '((sequence "TODO" "IN-PROGRESS" "WAITING" "|" "DONE" "CANCELED")))
-
-   ;; ORG-MODE: Behavior and key map for opening the agenda
-   (defun gpk-pop-to-org-agenda (split)
-     "Visit the org agenda, in the current window or a SPLIT."
-     (interactive "P")
-     (org-agenda-list)
-     (when (not split)
-       (delete-other-windows)))
-   (define-key global-map (kbd "C-c a") 'gpk-pop-to-org-agenda)
-   (setq org-capture-templates
-	 '(("t" "My TODO task format." entry
-	    (file "me.org")
-	   "* TODO [#B] %?\n SCHEDULED: %t")))
-
-   ;;;; ORG-MODE: Behavior and key-map for capturing tasks
-   (defun gpk-org-task-capture ()
-    "Capture a task with my default template."
-     (interactive)
-       (org-capture nil "t"))
-   (define-key global-map (kbd "C-c t") 'gpk-org-task-capture)
-   (define-key global-map (kbd "C-c C-x s") 'org-babel-execute-src-block)
-
-   (setq org-default-notes-file "/Users/boontdustie/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org")
-
-   (setq org-agenda-tag-filter-preset
-	 (quote ("-backlog")))
-
-   ;; Collect all .org from my Org directory and subdirs
-   (setq org-agenda-file-regexp "\\`[^.].*\\.org\\'") ; default value
-   (defun load-org-agenda-files-recursively (dir) "Find all directories in DIR."
-      (unless (file-directory-p dir) (error "Not a directory `%s'" dir))
-      (unless (equal (directory-files dir nil org-agenda-file-regexp t) nil)
-    (add-to-list 'org-agenda-files dir)
-      )
-      (dolist (file (directory-files dir nil nil t))
-     (unless (member file '("." ".."))
-	(let ((file (concat dir file "/")))
-	  (when (file-directory-p file)
-		 (load-org-agenda-files-recursively file))))))
-   (load-org-agenda-files-recursively "/Users/boontdustie/Library/Mobile Documents/iCloud~com~appsonthemove~beorg/Documents/org")
-
-   (setq org-refile-targets
-      '((nil :maxlevel . 14)
-	 (org-agenda-files :maxlevel . 14)))
-
-  ;;  ; ;;;; ORG-MODE: Other customizations
-  (setq org-agenda-text-search-extra-files '(agenda-archives))
-    (setq org-blank-before-new-entry '((heading . t)
-				      (plain-list-item . t)))
-   (setq org-enforce-todo-dependencies t)
-   (setq org-log-done (quote time))
-   (setq org-log-redeadline (quote time))
-   (setq org-log-reschedule (quote time))
-   ;;(setq org-hide-emphasis-markers t)
-   (setq org-agenda-timegrid-use-ampm t)
-
-   ;; ORG-MODE: Evil key mapping
-   (add-hook 'org-agenda-mode-hook
-	     (lambda ()
-	       (define-key org-agenda-mode-map "j"         'org-agenda-next-line)
-	       (define-key org-agenda-mode-map "k"         'org-agenda-previous-line)
-	       (define-key org-agenda-mode-map "n"         'org-agenda-next-date-line)
-	       (define-key org-agenda-mode-map "p"         'org-agenda-previous-date-line)
-	       (define-key org-agenda-mode-map ":"         'org-agenda-set-tags)
-	       (define-key org-agenda-mode-map (kbd "RET") 'org-agenda-switch-to)
-	       ))
-
-   ;; ORG-MODE: Auto insert when capturing tasks
-   (add-hook 'org-capture-mode-hook
-	     (lambda ()
-	       (evil-insert-state)))
-   (put 'erase-buffer 'disabled nil)
-
-   (setq org-agenda-skip-scheduled-if-done t)
-
-   ;; GPK: Potential danger because uncommenting.
-   (global-set-key "\C-cf" 'org-agenda)
-   (setq org-agenda-skip-deadline-prewarning-if-scheduled 3)
-
-   (define-key global-map (kbd "C-c C-a") 'org-attach)
-   (define-key global-map (kbd "C-c C-O") 'org-attach-open-in-emacs)
-
-  #+end_src
 
 *** Useful major modes
 Markdown mode and Web mode, the latter covers our usages of HTML/CSS/JS/JSX/TS/TSX/JSON.

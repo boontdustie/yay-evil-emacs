@@ -80,6 +80,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(font-lock-comment-face ((t (:foreground "#6e6a86" :slant italic :weight semi-bold :height 120 :width normal :foundry "UKWN" :family "Victor Mono"))))
-  '(font-lock-keyword-face ((t (:foreground "#c4a7e7" :slant italic :weight normal :height 160 :width normal :foundry "UKWN" :family "Victor Mono")))))
+  '(font-lock-keyword-face ((t (:foreground "#c4a7e7" :slant italic :weight normal :height 120 :width normal :foundry "UKWN" :family "Victor Mono")))))
 
 (provide 'init)
